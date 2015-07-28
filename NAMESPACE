@@ -1,0 +1,3 @@
+useDynLib(TuringMachine)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
