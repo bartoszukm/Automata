@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <Rcpp.h>
+#include <algorithm>
 #include "transitionFunction.h"
 
 using namespace Rcpp;
@@ -20,8 +21,10 @@ class TuringMachine
    size_t tapeSize;
    size_t head;
 
+   bool isFinalState();
+
 public:
-   TuringMachine(char blankSymbol, std::vector< std::string > transitionFunction, size_t tapeSize, std::string initialState, std::vector< std::string > finalStates, std::string tape);
+   TuringMachine(char blankSymbol, std::vector< std::string > transitionFunction, size_t tapeSize, std::string initialState, std::vector< std::string > finalStates, std::string tape, char head);
    void print();
    void execute(bool debug, size_t iterations);
 };

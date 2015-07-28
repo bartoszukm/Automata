@@ -15,7 +15,7 @@ namespace Automata
 struct TransitionFunctionResult
 {
    string state;
-   char movement;
+   int movement;
    char symbol;
 };
 

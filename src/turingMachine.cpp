@@ -1,7 +1,7 @@
 #include "turingMachine.h"
 using namespace Automata;
 
-TuringMachine::TuringMachine(char blankSymbol, std::vector< std::string > transitionFunction, size_t tapeSize, std::string initialState, std::vector< std::string > finalStates, std::string tape)
+TuringMachine::TuringMachine(char blankSymbol, std::vector< std::string > transitionFunction, size_t tapeSize, std::string initialState, std::vector< std::string > finalStates, std::string tape, char head)
    : tape(tapeSize, blankSymbol), f(transitionFunction), tapeSize(tapeSize), state(initialState), finalStates(finalStates)
 {
    size_t t = tapeSize - tape.size();
@@ -10,6 +10,7 @@ TuringMachine::TuringMachine(char blankSymbol, std::vector< std::string > transi
    {
       this->tape[i] = tape[i - t/2];
    }
+   this->head = head == 'R' ? t/2 + tape.size() - 1 : t/2;
 }
 
 void TuringMachine::print()
@@ -20,10 +21,15 @@ void TuringMachine::print()
    Rcout << "]";
 }
 
+bool TuringMachine::isFinalState()
+{
+   return find(finalStates.begin(), finalStates.end(), state) != finalStates.end();
+}
+
 void TuringMachine::execute(bool debug, size_t iterations)
 {
    size_t iter = 0;
-   while(state != finalStates[0] && iter < iterations)
+   while(!isFinalState() && iter < iterations)
    {
       TransitionFunctionResult tfr = f(tape[head], state);
       tape[head] = tfr.symbol;
@@ -35,9 +41,9 @@ void TuringMachine::execute(bool debug, size_t iterations)
 }
 
 // [[Rcpp::export]]
-SEXP turingmachine_create(char blankSymbol, std::vector< std::string > transitionFunction, size_t tapeSize, std::string initialState, std::vector< std::string > finalStates, std::string tape)
+SEXP turingmachine_create(char blankSymbol, std::vector< std::string > transitionFunction, size_t tapeSize, std::string initialState, std::vector< std::string > finalStates, std::string tape, char head)
 {
-   TuringMachine* tm = new TuringMachine(blankSymbol, transitionFunction, tapeSize, initialState, finalStates, tape);
+   TuringMachine* tm = new TuringMachine(blankSymbol, transitionFunction, tapeSize, initialState, finalStates, tape, head);
    XPtr< TuringMachine > retval =  XPtr< TuringMachine >(tm, true);
    retval.attr("class") = "TuringMachine";
    return retval;
@@ -48,4 +54,11 @@ void turingmachine_print(SEXP tm)
 {
    XPtr< TuringMachine > turingmachine = Rcpp::as< XPtr< TuringMachine > > (tm);
    turingmachine->print();
+}
+
+// [[Rcpp::export]]
+void turingmachine_execute(SEXP tm, bool debug, size_t iterations)
+{
+   XPtr< TuringMachine > turingmachine = Rcpp::as< XPtr< TuringMachine > > (tm);
+   turingmachine->execute(debug, iterations);
 }
