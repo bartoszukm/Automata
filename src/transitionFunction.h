@@ -1,10 +1,16 @@
+#ifndef __TRANSITION_FUNCTION_H
+#define __TRANSITION_FUNCTION_H
+
 #include <vector>
 #include <unordered_map>
+#include <vector>
+#include <string>
+#include <Rcpp.h>
 
+using namespace Rcpp;
 using namespace std;
-using namespace rcpp;
 
-namespace TuringMachine
+namespace Automata
 {
 struct TransitionFunctionResult
 {
@@ -15,27 +21,11 @@ struct TransitionFunctionResult
 
 class TransitionFunction
 {
-    unordered_map<string, unordered_map<string, TransitionFunctionResult> > f; //najpierw znak, potem stan
+    unordered_map<char, unordered_map<string, TransitionFunctionResult> > f; //najpierw znak, potem stan
 public:
-   TransitionFunction(CharacterVector transitionFunction)
-   {
-      //dla kazdego napisu z transitionFunction:
-      //wez jego wejsciowy znak. Sprawdz, czy juz istnieje mapa dla tego znaku. Stworz w razie gdyby nie
-      //wez jego wejsciowy stan. Sprawdz, czy niczego nie ma. Nie powinno byc. Tam wrzuc TransitionFunctionResult, w ktorym jest state, symbol i movement
-   }
-   
-   TransitionFunctionResult operator(char symbol, string state)
-   {
-      auto stateMap = f.find(symbol);
-      if(stateMap != f.end())
-      {
-         auto tfr = stateMap.find(state);
-         return tfr;
-      }
-      else
-      {
-            Rcpp:stop("there is no transition");
-      }
-   }
+   TransitionFunction(std::vector< std::string > transitionFunction);
+   TransitionFunctionResult operator()(char symbol, string state);
 };
 }
+
+#endif
